@@ -14,6 +14,6 @@ RUN yarn build
 # -- RUN STAGE
 FROM nginx:1.19.9
 
-COPY --from=build-stage /usr/src/app/build /usr/share/nginx/html/schematic-viewer
+COPY --from=build-stage /usr/src/app/build /usr/share/nginx/html
 
 EXPOSE 80
