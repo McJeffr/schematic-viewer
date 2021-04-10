@@ -19,24 +19,37 @@ jobs:
       - name: CI/1. Checkout repository
         uses: actions/checkout@v2
 
-      - name: CI/2. Extract version from ref
+      - name: CI/2. Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: CI/3. Extract version from ref
         id: extract-version
         run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\/v/}
 
-      - name: CI/3. Add dynamic environment variables
+      - name: CI/4. Add dynamic environment variables
         uses: allenevans/set-env@v2.0.0
         with:
           IMAGE_ID: ${{ secrets.REGISTRY_HOST }}/${{ env.IMAGE_NAME }}
           IMAGE_VERSION: ${{ steps.extract-version.outputs.version }}
           IMAGE: ${{ secrets.REGISTRY_HOST }}/${{ env.IMAGE_NAME }}:${{ steps.extract-version.outputs.version }}
 
-      - name: CI/4. Docker build
+      - name: CI/5. Docker build
         run: docker build --tag $IMAGE_NAME .
 
-      - name: CI/5. Docker login
+      - name: CI/6. Docker login
         run: echo "$REGISTRY_PASSWORD" | docker login "$REGISTRY_HOST" -u "$REGISTRY_USERNAME" --password-stdin
 
-      - name: CI/6. Docker push
+      - name: CI/7. Docker push
         run: |
           # Push the image to our repository
           docker tag $IMAGE_NAME $IMAGE
