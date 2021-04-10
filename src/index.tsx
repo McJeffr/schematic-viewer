@@ -5,6 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { Shadows } from "@material-ui/core/styles/shadows";
+import { Route, BrowserRouter as Router } from "react-router-dom";
 
 const theme = createMuiTheme({
   palette: {
@@ -23,7 +24,11 @@ const theme = createMuiTheme({
 
 ReactDOM.render(
   <ThemeProvider theme={theme}>
-    <App />
+    <Router basename="/schematic-viewer">
+      <Route path="/">
+        <App />
+      </Route>
+    </Router>
   </ThemeProvider>,
   document.getElementById("root")
 );
