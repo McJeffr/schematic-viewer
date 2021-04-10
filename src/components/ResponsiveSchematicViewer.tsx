@@ -2,7 +2,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import SchematicViewer from "@mcjeffr/react-schematicwebviewer";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
+import Alert from "@material-ui/lab/Alert";
 
 export interface ResponsiveSchematicViewerProps {
   schematic: string;
@@ -25,24 +26,43 @@ const ResponsiveSchematicViewer: FC<ResponsiveSchematicViewerProps> = ({
   schematic,
 }) => {
   const classes = useStyles();
+  const [timedOut, setTimedOut] = useState<boolean>(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimedOut(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <>
-      <SchematicViewer
-        jarUrl="https://cors-proxy.mcjeffr.com/https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar"
-        schematic={schematic}
-        size={600}
-        loader={
-          <div className={classes.spinnerContainer}>
-            <div className={classes.spinner}>
-              <CircularProgress size={100} />
-              <Typography variant="body1" className={classes.spinnerText}>
-                Loading schematic...
-              </Typography>
+      {timedOut ? (
+        <div>
+          <Alert severity="error">
+            Timeout occurred whilst loading the preview. There is a high chance
+            that your file is either too old to process or has been corrupted.
+            Downloading the .schem file might result in a broken schematic being
+            returned.
+          </Alert>
+        </div>
+      ) : (
+        <SchematicViewer
+          jarUrl="https://cors-proxy.mcjeffr.com/https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar"
+          schematic={schematic}
+          size={600}
+          loader={
+            <div className={classes.spinnerContainer}>
+              <div className={classes.spinner}>
+                <CircularProgress size={100} />
+                <Typography variant="body1" className={classes.spinnerText}>
+                  Loading schematic...
+                </Typography>
+              </div>
             </div>
-          </div>
-        }
-      />
+          }
+        />
+      )}
     </>
   );
 };

@@ -16,6 +16,8 @@ import CardHeader from "@material-ui/core/CardHeader";
 import IconButton from "@material-ui/core/IconButton";
 import ClearIcon from "@material-ui/icons/Clear";
 import save from "save-file";
+import Snackbar from "@material-ui/core/Snackbar";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -60,6 +62,7 @@ const displayFileType = (schematicType: SchematicType) => {
 
 const ViewerPage = () => {
   const classes = useStyles();
+  const [error, showError] = useState<string | null>(null);
   const [schematic, setSchematic] = useState<{
     type: SchematicType;
     file: File;
@@ -77,18 +80,29 @@ const ViewerPage = () => {
     let fileBuffer = arrayBufferToBuffer(await schematic.file.arrayBuffer());
 
     let schemBuffer: Buffer;
-    switch (schematic.type) {
-      case SchematicType.SPONGE: {
-        schemBuffer = fileBuffer;
-        break;
+    try {
+      switch (schematic.type) {
+        case SchematicType.SPONGE: {
+          schemBuffer = fileBuffer;
+          break;
+        }
+        case SchematicType.MCEDIT: {
+          schemBuffer = await schematic2schem(fileBuffer);
+          break;
+        }
+        case SchematicType.STRUCTURE: {
+          schemBuffer = await struct2schem(fileBuffer);
+        }
       }
-      case SchematicType.MCEDIT: {
-        schemBuffer = await schematic2schem(fileBuffer);
-        break;
-      }
-      case SchematicType.STRUCTURE: {
-        schemBuffer = await struct2schem(fileBuffer);
-      }
+    } catch (err) {
+      showError(
+        err.message
+          ? err.message
+          : "Could not process file: unknown exception occurred."
+      );
+      setSchematic(null);
+      setSchem(null);
+      return;
     }
 
     const schem = {
@@ -162,6 +176,16 @@ const ViewerPage = () => {
   return (
     <>
       <Container className={classes.container}>{card}</Container>
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        open={!!error}
+        autoHideDuration={4000}
+        onClose={() => showError(null)}
+      >
+        <Alert severity="error" elevation={6} variant="filled">
+          {error}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
