@@ -31,7 +31,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          envs: CONTAINER_NAME,IMAGE,REGISTRY_HOST,REGISTRY_USERNAME,REGISTRY_PASSWORD
+          envs: CONTAINER_NAME,IMAGE,REGISTRY_HOST,REGISTRY_USERNAME,REGISTRY_PASSWORD,URL
           script: |
             # Log into repository
             echo $REGISTRY_PASSWORD | docker login $REGISTRY_HOST -u $REGISTRY_USERNAME --password-stdin
@@ -50,5 +50,5 @@ jobs:
             -l 'traefik.http.routers.schematic-viewer.middlewares'='redirect@file' \
             -l 'traefik.http.routers.schematic-viewer.rule'="HOST(\`$URL\`)" \
             --name "$CONTAINER_NAME" "$IMAGE"
-            docker connect web "$CONTAINER_NAME"
+            docker network connect web "$CONTAINER_NAME"
             docker start "$CONTAINER_NAME"
