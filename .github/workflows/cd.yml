@@ -41,4 +41,14 @@ jobs:
             docker rm "$CONTAINER_NAME"
 
             # Start new instance
-            docker run -d --name $CONTAINER_NAME -d -e TOKEN=${{ secrets.TOKEN }} $IMAGE
+            docker create \
+            -l 'traefik.enable'=true \
+            -l 'traefik.http.routers.schematic-viewer-secured.entrypoints'=web-secured \
+            -l 'traefik.http.routers.schematic-viewer-secured.rule'="HOST(\`$URL\`)" \
+            -l 'traefik.http.routers.schematic-viewer-secured.tls.certresolver'=myhttpchallenge \
+            -l 'traefik.http.routers.schematic-viewer.entrypoints'=web \
+            -l 'traefik.http.routers.schematic-viewer.middlewares'='redirect@file' \
+            -l 'traefik.http.routers.schematic-viewer.rule'="HOST(\`$URL\`)" \
+            --name "$CONTAINER_NAME" "$IMAGE"
+            docker connect web "$CONTAINER_NAME"
+            docker start "$CONTAINER_NAME"
