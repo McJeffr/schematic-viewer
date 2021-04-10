@@ -24,7 +24,7 @@ const theme = createMuiTheme({
 
 ReactDOM.render(
   <ThemeProvider theme={theme}>
-    <Router basename="/schematic-viewer">
+    <Router>
       <Route path="/">
         <App />
       </Route>
