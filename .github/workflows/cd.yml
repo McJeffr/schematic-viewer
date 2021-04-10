@@ -13,6 +13,7 @@ env:
   REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
   REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
   REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+  URL: ${{ secrets.URL }}
 
 jobs:
   cd:
