@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+env:
+  CONTAINER_NAME: schematic-viewer
+  IMAGE_NAME: schematic-viewer
+  REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI/1. Checkout repository
+        uses: actions/checkout@v2
+
+      - name: CI/2. Extract version from ref
+        id: extract-version
+        run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\/v/}
+
+      - name: CI/3. Add dynamic environment variables
+        uses: allenevans/set-env@v2.0.0
+        with:
+          IMAGE_ID: ${{ secrets.REGISTRY_HOST }}/${{ env.IMAGE_NAME }}
+          IMAGE_VERSION: ${{ steps.extract-version.outputs.version }}
+          IMAGE: ${{ secrets.REGISTRY_HOST }}/${{ env.IMAGE_NAME }}:${{ steps.extract-version.outputs.version }}
+
+      - name: CI/4. Docker build
+        run: docker build --tag $IMAGE_NAME .
+
+      - name: CI/5. Docker login
+        run: echo "$REGISTRY_PASSWORD" | docker login "$REGISTRY_HOST" -u "$REGISTRY_USERNAME" --password-stdin
+
+      - name: CI/6. Docker push
+        run: |
+          # Push the image to our repository
+          docker tag $IMAGE_NAME $IMAGE
+          docker push $IMAGE

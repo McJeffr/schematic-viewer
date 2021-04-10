@@ -1,0 +1,44 @@
+name: CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Docker Tag'
+        required: true
+
+env:
+  CONTAINER_NAME: schematic-viewer
+  IMAGE_NAME: schematic-viewer
+  REGISTRY_HOST: ${{ secrets.REGISTRY_HOST }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CD/1. Add dynamic environment variables
+        uses: allenevans/set-env@v2.0.0
+        with:
+          IMAGE_ID: ${{ secrets.REGISTRY_HOST }}/${{ env.IMAGE_NAME }}
+          IMAGE_VERSION: ${{ github.event.inputs.tag }}
+          IMAGE: ${{ secrets.REGISTRY_HOST }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.tag }}
+
+      - name: CD/2. Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          envs: CONTAINER_NAME,IMAGE,REGISTRY_HOST,REGISTRY_USERNAME,REGISTRY_PASSWORD
+          script: |
+            # Log into repository
+            echo $REGISTRY_PASSWORD | docker login $REGISTRY_HOST -u $REGISTRY_USERNAME --password-stdin
+
+            # Stop and remove old instance
+            docker stop "$CONTAINER_NAME"
+            docker rm "$CONTAINER_NAME"
+
+            # Start new instance
+            docker run -d --name $CONTAINER_NAME -d -e TOKEN=${{ secrets.TOKEN }} $IMAGE
