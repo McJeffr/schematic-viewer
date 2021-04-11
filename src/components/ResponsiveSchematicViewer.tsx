@@ -27,6 +27,7 @@ const ResponsiveSchematicViewer: FC<ResponsiveSchematicViewerProps> = ({
 }) => {
   const classes = useStyles();
   const [timedOut, setTimedOut] = useState<boolean>(false);
+  const [loaded, setLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -37,7 +38,7 @@ const ResponsiveSchematicViewer: FC<ResponsiveSchematicViewerProps> = ({
 
   return (
     <>
-      {timedOut ? (
+      {timedOut && !loaded ? (
         <div>
           <Alert severity="error">
             Timeout occurred whilst loading the preview. There is a high chance
@@ -61,6 +62,7 @@ const ResponsiveSchematicViewer: FC<ResponsiveSchematicViewerProps> = ({
               </div>
             </div>
           }
+          onLoaded={() => setLoaded(true)}
         />
       )}
     </>

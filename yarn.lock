@@ -1509,10 +1509,10 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
-"@mcjeffr/react-schematicwebviewer@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@mcjeffr/react-schematicwebviewer/-/react-schematicwebviewer-1.1.1.tgz#fae787ae54f2c954ee3da17279102bbb3a77dd80"
-  integrity sha512-FxJIp1J7PcHjx+wb523JKK6C8bgGNQXgCUl01KYU9c34FYXfm2I8l8HJotQPiOIhpwHElgreA2Hb9saSGTh3ZA==
+"@mcjeffr/react-schematicwebviewer@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@mcjeffr/react-schematicwebviewer/-/react-schematicwebviewer-1.2.0.tgz#724c36e01efa44460043b97f9d03c4b62a11e998"
+  integrity sha512-CYpbZgnZZnE8GsxNTz8gyucWNBAfRgDLUevtgz6wkANUNeUHdM16iAMlTGUefWBAKenvwrc5zMswTBH+/fVpqw==
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
