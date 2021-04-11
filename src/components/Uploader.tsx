@@ -3,6 +3,7 @@ import { DropzoneArea } from "material-ui-dropzone";
 import Alert from "@material-ui/lab/Alert";
 import React, { FC, useState } from "react";
 import SchematicType from "../enums/schematic-type";
+import { getFileExtension } from "../utils/files";
 
 export interface UploaderProps {
   onUpload: (schematic: { type: SchematicType; file: File }) => void;
@@ -17,7 +18,7 @@ const Uploader: FC<UploaderProps> = ({ onUpload }) => {
     }
 
     const file = files[0];
-    const extension = file.name.split(".").pop();
+    const extension = getFileExtension(file.name);
     let schematicType;
     switch (extension) {
       case "schem":

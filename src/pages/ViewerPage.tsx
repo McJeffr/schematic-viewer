@@ -5,9 +5,6 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import React, { useState } from "react";
-import struct2schem from "struct2schem";
-import schematic2schem from "schematic2schem";
-import arrayBufferToBuffer from "arraybuffer-to-buffer";
 import Uploader from "../components/Uploader";
 import SchematicType from "../enums/schematic-type";
 import EnhancedSchematicViewer from "../components/EnhancedSchematicViewer";
@@ -18,6 +15,9 @@ import ClearIcon from "@material-ui/icons/Clear";
 import save from "save-file";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
+import axios from "axios";
+import { blobToBase64, blobToJson } from "../utils/blobs";
+import { getFileNameWithoutExtension } from "../utils/files";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -67,7 +67,7 @@ const ViewerPage = () => {
     type: SchematicType;
     file: File;
   } | null>(null);
-  const [schem, setSchem] = useState<{ buffer: Buffer; base64: string } | null>(
+  const [schem, setSchem] = useState<{ file: File; base64: string } | null>(
     null
   );
 
@@ -77,40 +77,57 @@ const ViewerPage = () => {
   }) => {
     setSchematic(schematic);
 
-    let fileBuffer = arrayBufferToBuffer(await schematic.file.arrayBuffer());
-
-    let schemBuffer: Buffer;
+    const form = new FormData();
+    form.append("file", schematic.file);
     try {
-      switch (schematic.type) {
-        case SchematicType.SPONGE: {
-          schemBuffer = fileBuffer;
-          break;
-        }
-        case SchematicType.MCEDIT: {
-          schemBuffer = await schematic2schem(fileBuffer);
-          break;
-        }
-        case SchematicType.STRUCTURE: {
-          schemBuffer = await struct2schem(fileBuffer);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      showError(
-        err.message
-          ? err.message
-          : "Could not process file: unknown exception occurred."
-      );
-      setSchematic(null);
-      setSchem(null);
-      return;
-    }
+      const res = await axios({
+        method: "post",
+        url: "https://schematic-converter.mcjeffr.com",
+        data: form,
+        headers: { "Content-Type": "multipart/form-data" },
+        responseType: "blob",
+      });
 
-    const schem = {
-      buffer: schemBuffer,
-      base64: schemBuffer.toString("base64"),
-    };
-    setSchem(schem);
+      const fileName = getFileNameWithoutExtension(schematic.file.name);
+      const file = new File([res.data], `${fileName}.schem`, {
+        type: res.data.type,
+      });
+      let base64 = await blobToBase64(res.data);
+      base64 = base64.substr(base64.indexOf(",") + 1);
+
+      const schem = {
+        file,
+        base64,
+      };
+      setSchem(schem);
+    } catch (err) {
+      if (err.response.data.type === "application/json") {
+        try {
+          const json = await blobToJson(err.response.data);
+          console.log(json.message);
+          showError(json.message);
+          setSchematic(null);
+          setSchem(null);
+        } catch (err) {
+          showError(
+            err.message
+              ? err.message
+              : "Could not process file: unknown exception occurred."
+          );
+          setSchematic(null);
+          setSchem(null);
+        }
+      } else {
+        showError(
+          err.message
+            ? err.message
+            : "Could not process file: unknown exception occurred."
+        );
+        setSchematic(null);
+        setSchem(null);
+      }
+      console.error(err);
+    }
   };
 
   const handleClose = () => {
@@ -140,12 +157,8 @@ const ViewerPage = () => {
           <Button
             color="primary"
             onClick={async () => {
-              const file = schematic.file.name
-                .split(".")
-                .slice(0, -1)
-                .join(".");
-
-              await save(schem.buffer, `${file}.schem`);
+              const file = getFileNameWithoutExtension(schematic.file.name);
+              await save(schem.file, `${file}.schem`);
             }}
           >
             Download as .schem file
