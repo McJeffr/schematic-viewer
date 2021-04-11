@@ -6,9 +6,15 @@ import ImageSearchIcon from "@material-ui/icons/ImageSearch";
 import React, { FC, useEffect, useState } from "react";
 import Alert from "@material-ui/lab/Alert";
 import { IconButton } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 
 export interface EnhancedSchematicViewerProps {
   schematic: string;
+}
+
+interface ViewerProps {
+  schematic: string;
+  onClose: () => void;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -21,6 +27,10 @@ const useStyles = makeStyles((theme) => ({
   },
   spinnerText: {
     marginTop: theme.spacing(2),
+  },
+  controls: {
+    display: "flex",
+    justifyContent: "center",
   },
 }));
 
@@ -41,12 +51,12 @@ const EnhancedSchematicViewer: FC<EnhancedSchematicViewerProps> = ({
 
   return (
     <div>
-      <Viewer schematic={schematic} />
+      <Viewer schematic={schematic} onClose={() => showPreview(false)} />
     </div>
   );
 };
 
-const Viewer: FC<EnhancedSchematicViewerProps> = ({ schematic }) => {
+const Viewer: FC<ViewerProps> = ({ schematic, onClose }) => {
   const classes = useStyles();
 
   const [timedOut, setTimedOut] = useState<boolean>(false);
@@ -78,22 +88,28 @@ const Viewer: FC<EnhancedSchematicViewerProps> = ({ schematic }) => {
           </Alert>
         </div>
       ) : (
-        <SchematicViewer
-          jarUrl="https://cors-proxy.mcjeffr.com/https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar"
-          schematic={schematic}
-          size={600}
-          loader={
-            <div className={classes.spinnerContainer}>
-              <div className={classes.spinner}>
-                <CircularProgress size={100} />
-                <Typography variant="body1" className={classes.spinnerText}>
-                  Loading schematic...
-                </Typography>
+        <div>
+          <SchematicViewer
+            jarUrl="https://cors-proxy.mcjeffr.com/https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar"
+            schematic={schematic}
+            orbit={false}
+            size={600}
+            loader={
+              <div className={classes.spinnerContainer}>
+                <div className={classes.spinner}>
+                  <CircularProgress size={100} />
+                  <Typography variant="body1" className={classes.spinnerText}>
+                    Loading schematic...
+                  </Typography>
+                </div>
               </div>
-            </div>
-          }
-          onLoaded={() => setLoaded(true)}
-        />
+            }
+            onLoaded={() => setLoaded(true)}
+          />
+          <div className={classes.controls}>
+            <Button onClick={onClose}>Close preview</Button>
+          </div>
+        </div>
       )}
     </>
   );

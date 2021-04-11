@@ -16,8 +16,10 @@ import save from "save-file";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
 import axios from "axios";
+import DownloadIcon from "@material-ui/icons/GetApp";
 import { blobToBase64, blobToJson } from "../utils/blobs";
 import { getFileNameWithoutExtension } from "../utils/files";
+import { arrayBufferToBase64 } from "../utils/buffers";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -76,6 +78,11 @@ const ViewerPage = () => {
     file: File;
   }) => {
     setSchematic(schematic);
+    if (schematic.type === SchematicType.SPONGE) {
+      const buffer: ArrayBuffer = await schematic.file.arrayBuffer();
+      setSchem({ file: schematic.file, base64: arrayBufferToBase64(buffer) });
+      return;
+    }
 
     const form = new FormData();
     form.append("file", schematic.file);
@@ -156,6 +163,7 @@ const ViewerPage = () => {
         <CardActions className={classes.cardActions}>
           <Button
             color="primary"
+            startIcon={<DownloadIcon />}
             onClick={async () => {
               const file = getFileNameWithoutExtension(schematic.file.name);
               await save(schem.file, `${file}.schem`);

@@ -24,7 +24,7 @@ const Navigation = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            Schematic Viewer
+            Schematic Converter
           </Typography>
           {/* <Button color="inherit">About</Button>
           <Button color="inherit">Viewer</Button>
