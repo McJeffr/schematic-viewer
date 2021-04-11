@@ -31,7 +31,7 @@ const ResponsiveSchematicViewer: FC<ResponsiveSchematicViewerProps> = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       setTimedOut(true);
-    }, 1000);
+    }, 10000);
     return () => clearTimeout(timer);
   }, []);
 
