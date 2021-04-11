@@ -10,7 +10,7 @@ import schematic2schem from "schematic2schem";
 import arrayBufferToBuffer from "arraybuffer-to-buffer";
 import Uploader from "../components/Uploader";
 import SchematicType from "../enums/schematic-type";
-import ResponsiveSchematicViewer from "../components/ResponsiveSchematicViewer";
+import EnhancedSchematicViewer from "../components/EnhancedSchematicViewer";
 import Button from "@material-ui/core/Button";
 import CardHeader from "@material-ui/core/CardHeader";
 import IconButton from "@material-ui/core/IconButton";
@@ -133,7 +133,7 @@ const ViewerPage = () => {
         />
         <CardContent>
           <div className={classes.viewerContainer}>
-            <ResponsiveSchematicViewer schematic={schem.base64} />
+            <EnhancedSchematicViewer schematic={schem.base64} />
           </div>
         </CardContent>
         <CardActions className={classes.cardActions}>

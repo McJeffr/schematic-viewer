@@ -2,10 +2,12 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import SchematicViewer from "@mcjeffr/react-schematicwebviewer";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import ImageSearchIcon from "@material-ui/icons/ImageSearch";
 import React, { FC, useEffect, useState } from "react";
 import Alert from "@material-ui/lab/Alert";
+import { IconButton } from "@material-ui/core";
 
-export interface ResponsiveSchematicViewerProps {
+export interface EnhancedSchematicViewerProps {
   schematic: string;
 }
 
@@ -22,10 +24,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ResponsiveSchematicViewer: FC<ResponsiveSchematicViewerProps> = ({
+const EnhancedSchematicViewer: FC<EnhancedSchematicViewerProps> = ({
   schematic,
 }) => {
+  const [previewed, showPreview] = useState<boolean>(false);
+
+  if (!previewed) {
+    return (
+      <div>
+        <IconButton onClick={() => showPreview(true)}>
+          <ImageSearchIcon fontSize="large" />
+        </IconButton>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Viewer schematic={schematic} />
+    </div>
+  );
+};
+
+const Viewer: FC<EnhancedSchematicViewerProps> = ({ schematic }) => {
   const classes = useStyles();
+
   const [timedOut, setTimedOut] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
 
@@ -41,10 +64,17 @@ const ResponsiveSchematicViewer: FC<ResponsiveSchematicViewerProps> = ({
       {timedOut && !loaded ? (
         <div>
           <Alert severity="error">
-            Timeout occurred whilst loading the preview. There is a high chance
-            that your file is either too old to process or has been corrupted.
-            Downloading the .schem file might result in a broken schematic being
-            returned.
+            Timeout occurred whilst loading the preview. You can still download
+            the .schem file but its integrity cannot be verified. Possible
+            reasons for the timeout:
+            <ul>
+              <li>
+                Your schematic contains blocks not yet supported by the
+                previewer
+              </li>
+              <li>The schematic conversion failed</li>
+              <li>Your schematic is corrupt</li>
+            </ul>
           </Alert>
         </div>
       ) : (
@@ -69,4 +99,4 @@ const ResponsiveSchematicViewer: FC<ResponsiveSchematicViewerProps> = ({
   );
 };
 
-export default ResponsiveSchematicViewer;
+export default EnhancedSchematicViewer;

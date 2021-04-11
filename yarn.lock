@@ -10187,10 +10187,10 @@ schema-utils@^3.0.0:
     ajv "^6.12.5"
     ajv-keywords "^3.5.2"
 
-schematic2schem@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/schematic2schem/-/schematic2schem-1.2.1.tgz#f1fbe12b5c03d24dc4077ed07e1925936ee68590"
-  integrity sha512-bsf9ZMM6lzr5e2rFLnnB1P0kvVXaNZv9Olz1RrisrlEiYAMDyw9LPU9f2PbFePRRYTzpemmjZEyBxDg1Eu2mfg==
+schematic2schem@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/schematic2schem/-/schematic2schem-1.2.2.tgz#525b0ec8d20cd420c8ceac29bc254fe6ee065b72"
+  integrity sha512-ZoQ6giQMYS0ABj+zFvRmVJjRsqClE98c0H6Ognl/+cRR/EldKwyFyDfsNcLAxrtBO6OepSdWsQTujHW0wV5abw==
   dependencies:
     prismarine-nbt "^1.4.0"
 
