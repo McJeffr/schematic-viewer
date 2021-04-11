@@ -95,6 +95,7 @@ const ViewerPage = () => {
         }
       }
     } catch (err) {
+      console.error(err);
       showError(
         err.message
           ? err.message
